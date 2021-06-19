@@ -10,6 +10,7 @@ const TableHead: FunctionComponent<TableHeadType> = ({config}) => {
         <thead>
             <tr>
                 {
+                    //loop through the config and grab the value from the header key to show the proper header
                     config.map((configItem: Config, index: number) => <th key={index}>{configItem.header}</th>)
                 }
             </tr>

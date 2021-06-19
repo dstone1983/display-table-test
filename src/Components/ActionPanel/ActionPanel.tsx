@@ -13,7 +13,9 @@ interface FormValues {
     end: string
 }
 
+//set a current date
 const currentDate = new Date()
+//set a current date then increase day by 7
 const oneWeekDate = new Date()
 oneWeekDate.setDate(currentDate.getDate() + 7)
 
@@ -23,7 +25,9 @@ const baseFormValues: FormValues = {
     end: moment(oneWeekDate).format('YYYY-MM-DD')
 }
 
+//this component handles all actions on the form and initial page loading
 const ActionPanel: FunctionComponent<ActionPanelType> = ({fetchData, setIsLoaded}) => {
+    //one state element of all form values to allow for one onChange function to simplify code base and size
     const [formValues, setFormValues] = useState(baseFormValues)
 
     const onChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

@@ -29,6 +29,8 @@ interface Params {
     to?: string;
 }
 
+//Custom basic table that when configured could accept any data
+//this config sets up the table to know how to built itself using the data provided
 const config: Config[] = [
     {
         header: 'Key',
@@ -60,6 +62,7 @@ function App() {
     const [data, setData] = useState<PlayonItems[]>([])
     const [error, setError] = useState("")
 
+    //function to handle all data calls and set appropriate state elements
     const fetchData = (start?: string, end?: string, association?: string) => {
         const url = 'https://search-api.nfhsnetwork.com/v2/search/events/upcoming'
         let params: Params = {
