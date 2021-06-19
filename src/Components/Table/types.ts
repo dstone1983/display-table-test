@@ -1,6 +1,7 @@
 export interface TableInterface {
     config: Config[];
-    data: Array<Record<any, any>>
+    data: Array<Record<any, any>>,
+    className?: string
 }
 
 export interface Config {

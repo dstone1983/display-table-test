@@ -1,0 +1,73 @@
+@import "../../colors.scss";
+
+.table-component {
+  width: 100%;
+  border: 1px solid $primary-light;
+  border-collapse: collapse;
+  margin: 0;
+  padding: 0;
+  table-layout: fixed;
+  thead {
+    th {
+      padding: .5em;
+      text-transform: uppercase;
+    }
+  }
+  tbody {
+    tr {
+      padding: .5em;
+      &:hover{
+        background: $primary-lighter
+      }
+      &:nth-of-type(odd) {
+        background: $primary-light;
+        &:hover {
+          background: $primary-lighter
+        }
+      }
+      td {
+        padding: .5em
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .table-component {
+    border: 0;
+    thead {
+      border: none;
+      clip: rect(0 0 0 0);
+      height: 1px;
+      margin: -1px;
+      overflow: hidden;
+      padding: 0;
+      position: absolute;
+      width: 1px;
+    }
+    tr {
+      border: 1px solid $primary-light;
+      display: block;
+      margin-bottom: .5em;
+    }
+    td {
+      display: block;
+      font-size: .9em;
+      text-align: right;
+      border-bottom: 1px solid $primary-light;
+      &::before {
+        /*
+        * aria-label has no advantage, it won't be read inside a table
+        content: attr(aria-label);
+        */
+        content: attr(data-label);
+        float: left;
+        font-weight: bold;
+        text-transform: uppercase;
+      }
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+  }
+}

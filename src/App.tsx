@@ -1,29 +1,32 @@
-import React, {useEffect, useState} from 'react';
-import './App.css';
+import React, {useState} from 'react';
+import './App.scss';
 import Table from "./Components/Table/Table";
 import axios, {AxiosResponse} from "axios";
 import {Config} from "./Components/Table/types";
 import moment from "moment";
+import ActionPanel from "./Components/ActionPanel/ActionPanel";
+import Loader from "./Components/Loader/Loader";
 
 interface PlayonData {
     items: PlayonItems[]
 }
 
 interface PlayonItems {
-    start_time: string;
+    date: string;
     level: string;
     key: string;
     sport: string;
-    publishers: Publishers[]
-}
-
-interface Publishers {
-    broadcasts: BroadCasts[]
-}
-
-interface BroadCasts {
     headline: string;
-    subheadline: string
+    subheadline: string;
+}
+
+interface Params {
+    state_association_key: string;
+    card: boolean;
+    size: number;
+    start: number;
+    from?: string;
+    to?: string;
 }
 
 const config: Config[] = [
@@ -33,17 +36,17 @@ const config: Config[] = [
     },
     {
         header: 'Headline',
-        key: 'publishers',
-        Cell: (data: Publishers[]) => <span>{data[0].broadcasts[0].headline}</span>
+        key: 'headline',
+        Cell: (data) => <span>{data}</span>
     },
     {
         header: 'SubHeadline',
-        key: 'publishers',
-        Cell: (data: Publishers[]) => <span>{data[0].broadcasts[0].subheadline}</span>
+        key: 'subheadline',
+        Cell: (data) => <span>{data}</span>
     },
     {
         header: 'Start Time',
-        key: 'start_time',
+        key: 'date',
         Cell: (data: string) => {
             const date = moment(data).format('MMMM Do YYYY h:mm a')
 
@@ -53,25 +56,50 @@ const config: Config[] = [
 ]
 
 function App() {
+    const [isLoaded, setIsLoaded] = useState(false)
     const [data, setData] = useState<PlayonItems[]>([])
     const [error, setError] = useState("")
 
-    useEffect(() => {
-        axios.get('https://search-api.nfhsnetwork.com/v2/search/events/upcoming?state_association_key=18bad24aaa&amp;card=true&amp;size=50&amp;start=0').then((res: AxiosResponse<PlayonData>) => {
+    const fetchData = (start?: string, end?: string, association?: string) => {
+        const url = 'https://search-api.nfhsnetwork.com/v2/search/events/upcoming'
+        let params: Params = {
+            state_association_key: association ? association : '18bad24aaa',
+            card: true,
+            size: 50,
+            start: 0
+        }
+
+        if (start && end) {
+            params = {
+                ...params,
+                from: moment(start).format('YYYY-MM-DDTHH:mm:ss[Z]'),
+                to: moment(end).set({'hour': 23, 'minute': 59, 'second': 59}).format('YYYY-MM-DDTHH:mm:ss[Z]')
+            }
+        }
+
+        axios.get(url, {params}).then((res: AxiosResponse<PlayonData>) => {
             if (res.data && res.data.items.length > 0) {
                 setData(res.data.items)
             } else {
                 setError("No results found")
             }
+            setIsLoaded(true)
         }).catch((err) => {
-            console.log(err)
+            if (err.response) {
+                setError(err.response.statusText)
+            } else {
+                setError("An unknown error occurred please try again or contact an adminstrator")
+            }
+            setIsLoaded(true)
         })
-    }, [])
+    }
 
     return (
         <div className="App">
             {error && <p>{error}</p>}
-            <Table config={config} data={data} />
+            {!isLoaded && <Loader />}
+            <ActionPanel fetchData={fetchData} setIsLoaded={setIsLoaded} />
+            <Table config={config} data={data} className="playon-table" />
         </div>
     )
 }
